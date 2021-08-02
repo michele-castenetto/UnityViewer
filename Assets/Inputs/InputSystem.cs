@@ -57,6 +57,30 @@ public class @InputSystem : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""FingerOnePosition"",
+                    ""type"": ""Value"",
+                    ""id"": ""484a6107-95e7-4a70-8dd6-e043818fa551"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""FingerTwoPosition"",
+                    ""type"": ""Value"",
+                    ""id"": ""0810f946-f9b6-475c-84f0-ccbeb987f2c2"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""FingetTwoTouch"",
+                    ""type"": ""Button"",
+                    ""id"": ""308910db-fe15-435b-99d0-4a5776bc831f"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press(behavior=2)""
                 }
             ],
             ""bindings"": [
@@ -114,6 +138,39 @@ public class @InputSystem : IInputActionCollection, IDisposable
                     ""action"": ""TouchPress"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""411144f1-2253-4fd8-a60e-bc5aac305232"",
+                    ""path"": ""<Touchscreen>/touch0/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FingerOnePosition"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a5300cb2-1367-4a8f-a6f4-ff80aa5f6cbf"",
+                    ""path"": ""<Touchscreen>/touch1/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FingerTwoPosition"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""af2e6878-f33f-4220-a9cc-c89152c51833"",
+                    ""path"": ""<Touchscreen>/touch1/press"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FingetTwoTouch"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -154,6 +211,9 @@ public class @InputSystem : IInputActionCollection, IDisposable
         m_Camera_LeftMouseButton = m_Camera.FindAction("LeftMouseButton", throwIfNotFound: true);
         m_Camera_TouchPosition = m_Camera.FindAction("TouchPosition", throwIfNotFound: true);
         m_Camera_TouchPress = m_Camera.FindAction("TouchPress", throwIfNotFound: true);
+        m_Camera_FingerOnePosition = m_Camera.FindAction("FingerOnePosition", throwIfNotFound: true);
+        m_Camera_FingerTwoPosition = m_Camera.FindAction("FingerTwoPosition", throwIfNotFound: true);
+        m_Camera_FingetTwoTouch = m_Camera.FindAction("FingetTwoTouch", throwIfNotFound: true);
         // Game
         m_Game = asset.FindActionMap("Game", throwIfNotFound: true);
         m_Game_Esc = m_Game.FindAction("Esc", throwIfNotFound: true);
@@ -211,6 +271,9 @@ public class @InputSystem : IInputActionCollection, IDisposable
     private readonly InputAction m_Camera_LeftMouseButton;
     private readonly InputAction m_Camera_TouchPosition;
     private readonly InputAction m_Camera_TouchPress;
+    private readonly InputAction m_Camera_FingerOnePosition;
+    private readonly InputAction m_Camera_FingerTwoPosition;
+    private readonly InputAction m_Camera_FingetTwoTouch;
     public struct CameraActions
     {
         private @InputSystem m_Wrapper;
@@ -220,6 +283,9 @@ public class @InputSystem : IInputActionCollection, IDisposable
         public InputAction @LeftMouseButton => m_Wrapper.m_Camera_LeftMouseButton;
         public InputAction @TouchPosition => m_Wrapper.m_Camera_TouchPosition;
         public InputAction @TouchPress => m_Wrapper.m_Camera_TouchPress;
+        public InputAction @FingerOnePosition => m_Wrapper.m_Camera_FingerOnePosition;
+        public InputAction @FingerTwoPosition => m_Wrapper.m_Camera_FingerTwoPosition;
+        public InputAction @FingetTwoTouch => m_Wrapper.m_Camera_FingetTwoTouch;
         public InputActionMap Get() { return m_Wrapper.m_Camera; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -244,6 +310,15 @@ public class @InputSystem : IInputActionCollection, IDisposable
                 @TouchPress.started -= m_Wrapper.m_CameraActionsCallbackInterface.OnTouchPress;
                 @TouchPress.performed -= m_Wrapper.m_CameraActionsCallbackInterface.OnTouchPress;
                 @TouchPress.canceled -= m_Wrapper.m_CameraActionsCallbackInterface.OnTouchPress;
+                @FingerOnePosition.started -= m_Wrapper.m_CameraActionsCallbackInterface.OnFingerOnePosition;
+                @FingerOnePosition.performed -= m_Wrapper.m_CameraActionsCallbackInterface.OnFingerOnePosition;
+                @FingerOnePosition.canceled -= m_Wrapper.m_CameraActionsCallbackInterface.OnFingerOnePosition;
+                @FingerTwoPosition.started -= m_Wrapper.m_CameraActionsCallbackInterface.OnFingerTwoPosition;
+                @FingerTwoPosition.performed -= m_Wrapper.m_CameraActionsCallbackInterface.OnFingerTwoPosition;
+                @FingerTwoPosition.canceled -= m_Wrapper.m_CameraActionsCallbackInterface.OnFingerTwoPosition;
+                @FingetTwoTouch.started -= m_Wrapper.m_CameraActionsCallbackInterface.OnFingetTwoTouch;
+                @FingetTwoTouch.performed -= m_Wrapper.m_CameraActionsCallbackInterface.OnFingetTwoTouch;
+                @FingetTwoTouch.canceled -= m_Wrapper.m_CameraActionsCallbackInterface.OnFingetTwoTouch;
             }
             m_Wrapper.m_CameraActionsCallbackInterface = instance;
             if (instance != null)
@@ -263,6 +338,15 @@ public class @InputSystem : IInputActionCollection, IDisposable
                 @TouchPress.started += instance.OnTouchPress;
                 @TouchPress.performed += instance.OnTouchPress;
                 @TouchPress.canceled += instance.OnTouchPress;
+                @FingerOnePosition.started += instance.OnFingerOnePosition;
+                @FingerOnePosition.performed += instance.OnFingerOnePosition;
+                @FingerOnePosition.canceled += instance.OnFingerOnePosition;
+                @FingerTwoPosition.started += instance.OnFingerTwoPosition;
+                @FingerTwoPosition.performed += instance.OnFingerTwoPosition;
+                @FingerTwoPosition.canceled += instance.OnFingerTwoPosition;
+                @FingetTwoTouch.started += instance.OnFingetTwoTouch;
+                @FingetTwoTouch.performed += instance.OnFingetTwoTouch;
+                @FingetTwoTouch.canceled += instance.OnFingetTwoTouch;
             }
         }
     }
@@ -307,6 +391,9 @@ public class @InputSystem : IInputActionCollection, IDisposable
         void OnLeftMouseButton(InputAction.CallbackContext context);
         void OnTouchPosition(InputAction.CallbackContext context);
         void OnTouchPress(InputAction.CallbackContext context);
+        void OnFingerOnePosition(InputAction.CallbackContext context);
+        void OnFingerTwoPosition(InputAction.CallbackContext context);
+        void OnFingetTwoTouch(InputAction.CallbackContext context);
     }
     public interface IGameActions
     {
