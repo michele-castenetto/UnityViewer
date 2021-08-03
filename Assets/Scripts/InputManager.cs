@@ -17,6 +17,27 @@ public class InputManager : Singleton<InputManager>
     public delegate void ExitEvent();
     public event ExitEvent OnExit; 
     
+    // Mouse Events
+
+    public delegate void LeftMouseButtonDownEvent(Vector2 position, float time);
+    public event LeftMouseButtonDownEvent OnLeftMouseButtonDown;
+
+    public delegate void LeftMouseButtonUpEvent(Vector2 position, float time);
+    public event LeftMouseButtonUpEvent OnLeftMouseButtonUp;
+
+    public delegate void MouseMoveEvent(Vector2 position, float time);
+    public event MouseMoveEvent OnMouseMove;
+
+    public delegate void WheelStartEvent();
+    public event WheelStartEvent OnWheelStart;
+
+    public delegate void WheelEndEvent();
+    public event WheelEndEvent OnWheelEnd;
+
+    public delegate void WheelMoveEvent(float delta);
+    public event WheelMoveEvent OnWheelMove;
+
+
     // Touch Events
     public delegate void TouchStartEvent(Vector2 position, float time);
     public event TouchStartEvent OnTouchStart; 
@@ -42,7 +63,7 @@ public class InputManager : Singleton<InputManager>
     private void Awake() {
         inputSystem = new InputSystem();
 
-        // InitMouseInput();
+        InitMouseInput();
         InitKeyboardInput();
         InitTouchInput();
 
@@ -66,7 +87,7 @@ public class InputManager : Singleton<InputManager>
     }
 
     void Exit(InputAction.CallbackContext context) {
-        Debug.Log("Exit key clicked");
+        // Debug.Log("Exit key clicked");
         if(OnExit != null) {
             OnExit();
         }
@@ -75,30 +96,72 @@ public class InputManager : Singleton<InputManager>
     // Mouse
 
     void InitMouseInput() {
-        // inputSystem.Camera.LeftMouseButton.started += ctx => cameraController.setLeftMouseButtonDown(true);
-        // inputSystem.Camera.LeftMouseButton.canceled += ctx => cameraController.setLeftMouseButtonDown(false);
 
-        // inputSystem.Camera.MousePosition.performed += ctx => cameraController.setMousePosition(ctx.ReadValue<Vector2>());
+        inputSystem.Camera.LeftMouseButton.started += ctx => HandleLeftMouseButtonDown(ctx);
+        inputSystem.Camera.LeftMouseButton.canceled += ctx => HandleLeftMouseButtonUp(ctx);
 
-        // inputSystem.Camera.MouseWheel.performed += ctx => cameraController.setWheelValue(ctx.ReadValue<Vector2>());
-        // inputSystem.Camera.MouseWheel.canceled += ctx => cameraController.setWheelValue(new Vector2(0, 0));
+        inputSystem.Camera.MousePosition.performed += ctx => HandleMouseMove(ctx);
+
+        inputSystem.Camera.MouseWheel.started += ctx => HandleWheelStart();
+        inputSystem.Camera.MouseWheel.canceled += ctx => HandleWheelEnd();
+        inputSystem.Camera.MouseWheel.performed += ctx => HandleWheelValue(ctx);
+
     }
+
+    private void HandleLeftMouseButtonDown(InputAction.CallbackContext context) {
+        // Debug.Log($"Left Mouse Button Down at position {inputSystem.Camera.MousePosition.ReadValue<Vector2>()}");
+        if(OnLeftMouseButtonDown != null) {
+            OnLeftMouseButtonDown(inputSystem.Camera.MousePosition.ReadValue<Vector2>(), (float)context.startTime);
+        }
+    }
+
+    private void HandleLeftMouseButtonUp(InputAction.CallbackContext context) {
+        // Debug.Log($"Left Mouse Button Up at position {inputSystem.Camera.MousePosition.ReadValue<Vector2>()}");
+        if(OnLeftMouseButtonUp != null) {
+            OnLeftMouseButtonUp(inputSystem.Camera.MousePosition.ReadValue<Vector2>(), (float)context.startTime);
+        }
+    }
+
+    private void HandleMouseMove(InputAction.CallbackContext context) {
+        // Debug.Log($"Mouse Move at position {inputSystem.Camera.MousePosition.ReadValue<Vector2>()}");
+        if(OnMouseMove != null) {
+            OnMouseMove(inputSystem.Camera.MousePosition.ReadValue<Vector2>(), (float)context.startTime);
+        }
+    }
+
+    private void HandleWheelStart() {
+        // Debug.Log($"Wheel Started");
+        if(OnWheelStart != null) {
+            OnWheelStart();
+        }
+    }
+
+    private void HandleWheelEnd() {
+        // Debug.Log($"Wheel Ended");
+        if(OnWheelEnd != null) {
+            OnWheelEnd();
+        }
+    }
+
+    private void HandleWheelValue(InputAction.CallbackContext context) {
+        float value = context.ReadValue<Vector2>().y;
+        // Debug.Log($"Wheel Move with value {context.ReadValue<Vector2>()}");
+        if(OnWheelMove != null) {
+            OnWheelMove(value);
+        }
+    }
+
+
 
     // Touch
 
     void InitTouchInput() {
         
-        // inputSystem.Camera.TouchPress.started += ctx => cameraController.setLeftMouseButtonDown(true);
         inputSystem.Camera.TouchPress.started += ctx => StartTouch(ctx);
         
-        // inputSystem.Camera.TouchPress.canceled += ctx => cameraController.setLeftMouseButtonDown(false);
         inputSystem.Camera.TouchPress.canceled += ctx => EndTouch(ctx);
         
-        // inputSystem.Camera.TouchPosition.performed += ctx => cameraController.setMousePosition(ctx.ReadValue<Vector2>());
         inputSystem.Camera.TouchPosition.performed += ctx => TouchMove(ctx);
-        
-        // inputSystem.Camera.FingetTwoTouch.started += _ => ZoomStart();
-        // inputSystem.Camera.FingetTwoTouch.canceled += _ => ZoomEnd();
 
         inputSystem.Camera.FingetTwoTouch.started += _ => ZoomStart();
         inputSystem.Camera.FingetTwoTouch.canceled += _ => ZoomEnd();

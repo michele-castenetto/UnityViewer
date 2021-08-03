@@ -9,14 +9,10 @@ public class CameraController : MonoBehaviour
 
     InputManager inputManager;
 
-    bool orbitEnabled = false;
-    
-    bool zoomEnabled = false;
+
 
     [SerializeField]
     private float rotationSensibility = 0.1f;
-    [SerializeField]
-    private float wheelSensibility = 1000f;
     [SerializeField]
     private float zoomSensibility = 50f;
 
@@ -31,26 +27,27 @@ public class CameraController : MonoBehaviour
     float beta = Mathf.Deg2Rad * 0f;
     
     
-    // The mouse cursor's position during the last frame
+    // The last frame pointer position  
     Vector3 last = new Vector3();
  
-    // The target that the camera looks at
+    // The target of camera
     Vector3 target = new Vector3 (0, 0, 0);
  
-    // The spherical coordinates
+    // Spherical coordinates
     Vector3 sc = new Vector3();
     
 
     // Pointer Inputs
     // --------------------------------
 
-    bool leftMouseButtonDown = false;
+    bool orbitEnabled = false;
+    
+    bool zoomEnabled = false;
+
     bool pointerDown = false;
 
-    Vector2 mousePosition = new Vector2(0, 0);
     Vector2 pointerPosition = new Vector2(0, 0);
 
-    float wheelValue = 0;
     float zoomValue = 0;
 
 
@@ -93,17 +90,30 @@ public class CameraController : MonoBehaviour
         mainCamera = Camera.main;
         inputManager = InputManager.Instance;
         
-        // inputManager.OnTouchStart += (pos, time) => setLeftMouseButtonDown(true);
-        // inputManager.OnTouchEnd += (pos, time) => setLeftMouseButtonDown(false);
-        // inputManager.OnTouchMove += (pos, time) => setMousePosition(pos);
+        // Mouse
+
+        inputManager.OnLeftMouseButtonDown += (pos, time) => setPointerDown(true);
+        inputManager.OnLeftMouseButtonUp += (pos, time) => setPointerDown(false);
+        inputManager.OnMouseMove += (pos, time) => setPointerPosition(pos);
+        
+        inputManager.OnWheelStart += () => setZoomEnabled(true);
+        inputManager.OnWheelEnd += () => setZoomEnabled(false);
+        inputManager.OnWheelMove += (value) => setZoomValueFromMouse(value);
+        
+        inputManager.OnLeftMouseButtonUp += (pos, time) => DetectPick();
+
+        // Touch
+
         inputManager.OnTouchStart += (pos, time) => setPointerDown(true);
         inputManager.OnTouchEnd += (pos, time) => setPointerDown(false);
-        inputManager.OnTouchEnd += (pos, time) => DetectPick();
         inputManager.OnTouchMove += (pos, time) => setPointerPosition(pos);
 
         inputManager.OnZoomStart += () => setZoomEnabled(true);
         inputManager.OnZoomEnd += () => setZoomEnabled(false);
         inputManager.OnZoomChange += (value) => setZoomValue(value);
+
+        inputManager.OnTouchEnd += (pos, time) => DetectPick();
+
 
         // Camera start position
         this.transform.position = new Vector3(radius, alpha, beta);
@@ -115,15 +125,6 @@ public class CameraController : MonoBehaviour
     }
 
 
-    public void setLeftMouseButtonDown(bool isDown) {
-        this.leftMouseButtonDown = isDown;
-    }
-    public void setMousePosition(Vector2 position) {
-        this.mousePosition = position;
-    }
-    public void setWheelValue(Vector2 value) {
-        this.wheelValue = value.y;
-    }
 
     public void setPointerDown(bool isDown) {
         this.pointerDown = isDown;
@@ -140,19 +141,15 @@ public class CameraController : MonoBehaviour
     public void setZoomValue(float value) {
         this.zoomValue = value;
     }
+    public void setZoomValueFromMouse(float value) {
+        this.zoomValue = value;
+    }
 
 
 
     void Update ()
     {
         
-        // ##OLD
-        // if(wheelValue != 0) {
-        //     sc.x -= wheelValue / wheelSensibility;
-        //     transform.position = getCartesianCoordinates(sc) + target;
-        //     transform.LookAt (target);
-        // }
-
         if (zoomEnabled) {
             
             float radius = sc.x - Time.deltaTime * zoomValue/zoomSensibility;

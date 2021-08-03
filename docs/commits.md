@@ -1,6 +1,11 @@
 # Commits
 
 
+## 04-08-2021
+- CameraController: gestione eventi input dal mouse
+- InputManager: revisione eventi mouse
+- UI: grafica pannello items
+
 ## 02-08-2021
 - InputSystem: interactions for multitouch
 - InputManager: events for pinch to zoom
