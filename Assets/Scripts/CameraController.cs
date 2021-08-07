@@ -1,13 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class CameraController : MonoBehaviour
 {
 
     Camera mainCamera;
-
     InputManager inputManager;
+    AppController appController;
 
 
 
@@ -17,28 +18,24 @@ public class CameraController : MonoBehaviour
     private float zoomSensibility = 50f;
 
 
-
     float radius = 8f;
-    float radiusMin = 1f;
-    float radiusMax = 10f;
+    float radiusMin = 2f;
+    float radiusMax = 15f;
+    float alpha = Mathf.Deg2Rad * 30f;
+    float beta = Mathf.Deg2Rad * 30;
+    float betaMin = Mathf.Deg2Rad * -89;
+    float betaMax = Mathf.Deg2Rad * 89;
 
 
-    float alpha = Mathf.Deg2Rad * 0f;
-    float beta = Mathf.Deg2Rad * 0f;
-    
-    
     // The last frame pointer position  
-    Vector3 last = new Vector3();
+    Vector3 lastPointerPosition = new Vector3();
  
     // The target of camera
-    Vector3 target = new Vector3 (0, 0, 0);
+    Vector3 target = new Vector3();
  
-    // Spherical coordinates
+    // Spherical coordinates (radius, alpha, beta)
     Vector3 sc = new Vector3();
     
-
-    // Pointer Inputs
-    // --------------------------------
 
     bool orbitEnabled = false;
     
@@ -84,13 +81,41 @@ public class CameraController : MonoBehaviour
     }
      
 
-    void Start()
+
+    private void Awake() {
+        AppController.Instance.SetCameraController(this);
+    }
+    
+
+    private void Start()
     {
 
         mainCamera = Camera.main;
         inputManager = InputManager.Instance;
+        appController = AppController.Instance;
         
-        // Mouse
+        // Camera Inputs
+        initInputMouseEvents();
+        initInputTouchEvents();
+        initAppEvents();
+
+        // Camera start position
+        sc = new Vector3(radius, alpha, beta);
+        this.transform.position = getCartesianCoordinates(sc);;
+        
+        // Camera Target 
+        // Debug.Log($"[CameraController.Start] Target is {target}");
+        this.transform.LookAt(target);
+
+    }
+
+
+    private void initAppEvents() {
+        appController.OnFocusEvent += () => Debug.Log("focus with camera");
+    }
+
+
+    private void initInputMouseEvents() {
 
         inputManager.OnLeftMouseButtonDown += (pos, time) => setPointerDown(true);
         inputManager.OnLeftMouseButtonUp += (pos, time) => setPointerDown(false);
@@ -102,7 +127,9 @@ public class CameraController : MonoBehaviour
         
         inputManager.OnLeftMouseButtonUp += (pos, time) => DetectPick();
 
-        // Touch
+    }
+
+    private void initInputTouchEvents() {
 
         inputManager.OnTouchStart += (pos, time) => setPointerDown(true);
         inputManager.OnTouchEnd += (pos, time) => setPointerDown(false);
@@ -114,41 +141,35 @@ public class CameraController : MonoBehaviour
 
         inputManager.OnTouchEnd += (pos, time) => DetectPick();
 
-
-        // Camera start position
-        this.transform.position = new Vector3(radius, alpha, beta);
-        // Camera Target 
-        this.transform.LookAt(target);
-
-        sc = getSphericalCoordinates(this.transform.position);
-
     }
 
 
-
-    public void setPointerDown(bool isDown) {
+    private void setPointerDown(bool isDown) {
         this.pointerDown = isDown;
     }
 
-    public void setPointerPosition(Vector2 position) {
+    private void setPointerPosition(Vector2 position) {
         this.pointerPosition = position;
     }
 
-    public void setZoomEnabled(bool enabled) {
+    private void setZoomEnabled(bool enabled) {
         this.zoomEnabled = enabled;
     }
 
-    public void setZoomValue(float value) {
+    private void setZoomValue(float value) {
         this.zoomValue = value;
     }
-    public void setZoomValueFromMouse(float value) {
+    private void setZoomValueFromMouse(float value) {
         this.zoomValue = value;
     }
 
 
 
-    void Update ()
+    private void Update ()
     {
+        
+        // If pointer interact with canvas UI do nothing
+        if (EventSystem.current.IsPointerOverGameObject()) return;
         
         if (zoomEnabled) {
             
@@ -164,8 +185,7 @@ public class CameraController : MonoBehaviour
         } 
 
         if (pointerDown == true && orbitEnabled == false) {
-            last = new Vector2(pointerPosition.x, pointerPosition.y);
-            // Debug.Log(last);
+            lastPointerPosition = new Vector2(pointerPosition.x, pointerPosition.y);
             orbitEnabled = true;
         }
 
@@ -177,32 +197,29 @@ public class CameraController : MonoBehaviour
             return;
         }
 
-        // Get the deltas that describe how much the mouse cursor got moved between frames
-        float dx = (last.x - pointerPosition.x) * rotationSensibility;
-        float dy = (last.y - pointerPosition.y) * rotationSensibility;
-        // Debug.Log(dx);
-
+        float alphaChange = (lastPointerPosition.x - pointerPosition.x) * rotationSensibility * Time.deltaTime;
+        float betaChange = (lastPointerPosition.y - pointerPosition.y) * rotationSensibility * Time.deltaTime;
 
         // Only update the camera's position if the mouse got moved in either direction
-        if (dx != 0f || dy != 0f)
+        if (alphaChange != 0f || betaChange != 0f)
         {
+            
+            // Rotate the camera on alpha angle (left and right)
+            sc.y += alphaChange;
+            // Rotate the camera on beta angle (up and down)
+            sc.z += betaChange;
+            sc.z = Mathf.Clamp(sc.z, betaMin, betaMax);
 
-            // Rotate the camera left and right
-            sc.y += dx * Time.deltaTime;
-
-            // Rotate the camera up and down
-            // Prevent the camera from turning upside down (1.5f = approx. Pi / 2)
-            sc.z = Mathf.Clamp (sc.z + dy * Time.deltaTime, -1.5f, 1.5f);
-
-            // Calculate the cartesian coordinates
+            // Sperical -> Cartesian
             transform.position = getCartesianCoordinates(sc) + target;
 
             // Look at the target
             transform.LookAt(target);
+
         }
 
         // Update the last pointer position
-        last = new Vector2(pointerPosition.x, pointerPosition.y);
+        lastPointerPosition = new Vector2(pointerPosition.x, pointerPosition.y);
         
     }
 
@@ -221,6 +238,42 @@ public class CameraController : MonoBehaviour
                 }
             }
         }
+
+    }
+
+
+    public void setStartPosition(float radius, float alpha, float beta) {
+        this.radius = radius;
+        this.alpha = alpha;
+        this.beta = beta;
+    }
+
+
+    public void FocusItemObject(GameObject gameObject) {
+
+        if (gameObject == null) return;
+        
+        this.target = gameObject.transform.position;
+
+        // Collider collider = gameObject.GetComponent<Collider>();
+        // if (collider == null) return;
+
+        // float[] ext = new float[] {
+        //     collider.bounds.extents.x,
+        //     collider.bounds.extents.y,
+        //     collider.bounds.extents.z
+        // };
+        // float radius = Mathf.Max(ext);
+        // Debug.Log($"Radius: {radius}");
+
+        // radiusMin = radius * 1.5f;
+        // radiusMax = radius * 6f;
+        
+
+        
+        // Renderer renderer = gameObject.GetComponent<Renderer>();
+        
+        
 
     }
 

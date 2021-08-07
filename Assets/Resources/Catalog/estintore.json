@@ -1,0 +1,15 @@
+{
+    "id": "estintore",
+    "label": "Estintore",
+    "image": "figurine",
+    "info": {
+        "title": "Estintore",
+        "description": "L'estintore serve per spegnere il fuoco"
+    },
+    "geometry": {
+        "file": "Cylinder"
+    },
+    "points": [
+        
+    ]
+}

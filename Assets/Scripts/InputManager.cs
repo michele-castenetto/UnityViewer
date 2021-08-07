@@ -4,9 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 
-[DefaultExecutionOrder(-1)]
-//##OLD
-// public class InputManager : MonoBehaviour
+[DefaultExecutionOrder(-2)]
 public class InputManager : Singleton<InputManager>
 {
     
@@ -61,6 +59,9 @@ public class InputManager : Singleton<InputManager>
     
 
     private void Awake() {
+
+        // Debug.Log("[InputManager.Awake]");
+
         inputSystem = new InputSystem();
 
         InitMouseInput();

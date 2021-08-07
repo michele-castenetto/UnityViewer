@@ -1,0 +1,23 @@
+{
+    "id": "ascia",
+    "label": "Ascia",
+    "image": "diamond",
+    "info": {
+        "title": "Ascia",
+        "description": "L'ascia serve per rompere cose"
+    },
+    "geometry": {
+        "file": "Cube"
+    },
+    "points": [
+        {
+            "id": "manico",
+            "label": "Manico",
+            "position": [0, 10, 0],
+            "info": {
+                "title": "Manico",
+                "description": ""
+            }
+        }
+    ]
+}
