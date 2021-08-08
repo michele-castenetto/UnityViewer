@@ -13,9 +13,18 @@
         {
             "id": "manico",
             "label": "Manico",
-            "position": [0, 10, 0],
+            "position": [-1, 1, 0],
             "info": {
                 "title": "Manico",
+                "description": ""
+            }
+        },
+        {
+            "id": "ascia",
+            "label": "Ascia",
+            "position": [1, 1, 0],
+            "info": {
+                "title": "Ascia",
                 "description": ""
             }
         }

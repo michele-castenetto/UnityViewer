@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ItemInfoUI : MonoBehaviour
+public class TabInfo : MonoBehaviour, ITab
 {
-    // public GameObject itemsTab;
-    private List<ItemUI> itemList;
+
     private AppController appController;
+    
     [SerializeField]
     private Text title;
     [SerializeField]
@@ -17,30 +17,33 @@ public class ItemInfoUI : MonoBehaviour
 
         appController = AppController.Instance;
         
-        appController.SetItemInfo(this);
+        appController.SetTabInfo(this);
 
     }
 
 
-    private void Start() {
-        appController.OnInfoEvent += () => ToggleItemsTab();
-    }
+    // ##OLD
+    // private void Start() {
+    //     appController.OnInfoEvent += () => ToggleTabInfo();
+    // }
 
     
-    private void ToggleItemsTab() {
-        gameObject.SetActive(!gameObject.activeSelf);
+    public void Toggle(bool active) {
+        gameObject.SetActive(active);
+    }
+    public void Toggle() {
+        Toggle(!gameObject.activeSelf);
     }
 
     
     public void UpdateUI(CatalogItem catalogItem)
     {
 
-        if (title != null)
-        {
+        if (title != null) {
             title.text = catalogItem.info.title;
         }
-        if (description != null)
-        {
+
+        if (description != null) {
             description.text = catalogItem.info.description;
         }
 

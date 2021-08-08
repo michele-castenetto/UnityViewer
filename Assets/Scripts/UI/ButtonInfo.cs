@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class InfoButtonUI : MonoBehaviour
+public class ButtonInfo : MonoBehaviour
 {
     private AppController appController;
     private Button button;
     private void Awake() {
         appController = AppController.Instance;
         button = GetComponent<Button>();
-        button.onClick.AddListener(() => appController.OnInfoEvent?.Invoke());
+        button.onClick.AddListener(() => appController.OnButtonInfoClickEvent?.Invoke());
     }
 }

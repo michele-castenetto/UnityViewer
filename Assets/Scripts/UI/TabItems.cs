@@ -4,11 +4,10 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ItemsTabUI : MonoBehaviour
+public class TabItems : MonoBehaviour, ITab
 {
-
-    private List<ItemUI> itemList;
     private AppController appController;
+
     [SerializeField]
     private GameObject itemPrefab;
     [SerializeField]
@@ -16,18 +15,21 @@ public class ItemsTabUI : MonoBehaviour
 
     private void Awake() {
 
-        // Debug.Log("[ItemsTabUI.Awake]");
-
         appController = AppController.Instance;
         
-        // itemList = GetComponentsInChildren<ItemUI>().ToList();
-
-        // itemList.ForEach(item => item.gameObject.SetActive(false));
-
-        appController.SetItemsTab(this);
+        appController.SetTabItems(this);
 
     }
     
+
+    public void Toggle(bool active) {
+        gameObject.SetActive(active);
+    }
+    public void Toggle() {
+        Toggle(!gameObject.activeSelf);
+    }
+
+
     public void UpdateUI(List<CatalogItem> catalogItems)
     {
         catalogItems.ForEach(catalogItem => {
@@ -40,18 +42,13 @@ public class ItemsTabUI : MonoBehaviour
     {   
         if (panel == null) return;
         if (itemPrefab == null) return;
-        if (catalogItem == null) return;
         
-        GameObject item = Instantiate(itemPrefab) as GameObject;
+        GameObject item = Instantiate<GameObject>(itemPrefab);
         item.transform.SetParent(panel.transform, false);
-
-        ItemUI itemUI = item.GetComponent<ItemUI>();
-        itemUI.id = catalogItem.id;
-        itemUI.label = catalogItem.label;
-
-        Sprite sprite = Resources.Load<Sprite>($"Images/{catalogItem.image}");
-        itemUI.image.sprite = sprite;
         
+        Item itemUI = item.GetComponent<Item>();
+        itemUI.UpdateUI(catalogItem);
+
     }
     
 }

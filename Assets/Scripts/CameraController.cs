@@ -97,8 +97,8 @@ public class CameraController : MonoBehaviour
         // Camera Inputs
         initInputMouseEvents();
         initInputTouchEvents();
-        initAppEvents();
-
+        // initAppEvents();
+        
         // Camera start position
         sc = new Vector3(radius, alpha, beta);
         this.transform.position = getCartesianCoordinates(sc);;
@@ -110,9 +110,9 @@ public class CameraController : MonoBehaviour
     }
 
 
-    private void initAppEvents() {
-        appController.OnFocusEvent += () => Debug.Log("focus with camera");
-    }
+    // private void initAppEvents() {
+    //     appController.OnFocusEvent += () => Debug.Log("focus with camera");
+    // }
 
 
     private void initInputMouseEvents() {
@@ -244,8 +244,8 @@ public class CameraController : MonoBehaviour
 
     public void setStartPosition(float radius, float alpha, float beta) {
         this.radius = radius;
-        this.alpha = alpha;
-        this.beta = beta;
+        this.alpha = alpha * Mathf.Deg2Rad;
+        this.beta = beta * Mathf.Deg2Rad;
     }
 
 

@@ -1,6 +1,10 @@
 # Commits
 
 
+## 08-08-2021
+- ITab interface
+- class name refactor
+
 ## 07-08-2021
 - AppController: link with managed controllers on Awake (CameraController, UI Tabs, ...)
 - AppController.Start: load config and catalog, update Tab Catalog UI and set camera start position 
@@ -19,6 +23,7 @@
 - ItemInfoUI
 - ItemsTabUI
 - ItemUI
+- CatalogItem
 - UI: tab item info
 - UI: tab catalog changes
 

@@ -1,4 +1,4 @@
- using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,11 +18,12 @@ public class AppController : Singleton<AppController>
     // Current itemObj
     GameObject itemObjSelected;
 
-    // Events
-    public delegate void FocusEvent();
-    public FocusEvent OnFocusEvent;
-    public delegate void InfoEvent();
-    public InfoEvent OnInfoEvent;
+
+    // UI Events
+    public delegate void ButtonFocusClickEvent();
+    public ButtonFocusClickEvent OnButtonFocusClickEvent;
+    public delegate void ButtonInfoClickEvent();
+    public ButtonInfoClickEvent OnButtonInfoClickEvent;
     public delegate void ItemSelectEvent(string id);
     public ItemSelectEvent OnItemSelectEvent;
 
@@ -32,15 +33,16 @@ public class AppController : Singleton<AppController>
     public void SetCameraController(CameraController controller) {
         cameraController = controller;
     }
-    private ItemsTabUI itemsTab;
-    public void SetItemsTab(ItemsTabUI _itemsTab) {
-        itemsTab = _itemsTab;
+    private TabItems tabItems;
+    public void SetTabItems(TabItems _tabItems) {
+        tabItems = _tabItems;
     }
-    private ItemInfoUI itemInfo;
-    public void SetItemInfo(ItemInfoUI _itemInfo) {
-        itemInfo = _itemInfo;
+    private TabInfo tabInfo;
+    public void SetTabInfo(TabInfo _tabInfo) {
+        this.tabInfo = _tabInfo;
     }
     
+
     private void Awake() {
 
         // Debug.Log("[AppController.Awake]");
@@ -53,9 +55,8 @@ public class AppController : Singleton<AppController>
 
     private void Start()
     {
-        // Debug.Log("[AppController.Start]");
-
-        // Debug.Log($"[AppController.Start] itemsTab: {itemsTab}");
+        
+        // Read Config file
 
         configReader.readConfig();
 
@@ -63,9 +64,11 @@ public class AppController : Singleton<AppController>
 
         catalogItems = configReader.readCatalog();
 
-        itemsTab.UpdateUI(catalogItems);
+        tabItems.UpdateUI(catalogItems);
 
-        cameraController.setStartPosition(8f, 0, 0);
+        // Set Camera position
+
+        cameraController.setStartPosition(8f, 30f, 30f);
 
         // Events link
 
@@ -73,8 +76,13 @@ public class AppController : Singleton<AppController>
 
         OnItemSelectEvent += id => LoadObject(id);
 
+        OnItemSelectEvent += id => UpdateTabInfo(id);
 
-        // 
+        OnButtonInfoClickEvent += () => tabInfo.Toggle();
+
+        // OnButtonFocusClickEvent += () => Debug.Log("focus with camera");
+
+        // Log App Start
 
         Debug.Log("[AppController.Start] App Started");
 
@@ -85,32 +93,29 @@ public class AppController : Singleton<AppController>
         Application.Quit();
     }
 
-    public void UpdateItemInfo(string id) {
+    public void UpdateTabInfo(string id) {
 
         CatalogItem catalogItem = catalogItems.Find(catalogItem => catalogItem.id == id);
         if (catalogItem == null) return;
         
-        itemInfo.UpdateUI(catalogItem);
+        tabInfo.UpdateUI(catalogItem);
 
     }
 
 
     public void LoadObject(string id) {
 
-        if (itemObjSelected != null)
-        {
+        if (itemObjSelected != null) {
             DestroyImmediate(itemObjSelected);
-            // Destroy(itemObjSelected, 0);
         }
 
         CatalogItem catalogItem = catalogItems.Find(catalogItem => catalogItem.id == id);
         catalogItemSelected = catalogItem;
         if (catalogItem == null) return;
         
-        // GameObject itemObj = Resources.Load($"Models/{catalogItem.geometry.file}") as GameObject;
         GameObject loadedObj = Resources.Load<GameObject>($"Models/{catalogItem.geometry.file}");
         if (loadedObj == null) {
-            Debug.Log("[AppController.LoadObject] itemObj is null");
+            Debug.Log($"[AppController.LoadObject] Resource model {catalogItem.geometry.file} is null");
             return;
         }
         Vector3 startPosition = new Vector3(0, 2, 0);
@@ -121,7 +126,24 @@ public class AppController : Singleton<AppController>
 
         cameraController.FocusItemObject(itemObj);
 
+        for (int i = 0; i < catalogItem.points.Length; i++)
+        {
+            AddInterestPoint(itemObj, catalogItem.points[i]);
+        }
+
     }
     
+    private void AddInterestPoint(GameObject itemObj, ItemPoint itemPoint) {
+
+        Vector3 position = new Vector3(itemPoint.position[0], itemPoint.position[1], itemPoint.position[2] );  
+
+        GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        // sphere.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+        sphere.transform.position = position;
+        
+        sphere.transform.parent = itemObj.transform;
+
+    }
+
 
 }
