@@ -20,7 +20,7 @@ public class ItemPoint
 [System.Serializable]
 public class Geometry
 {
-    public string file;
+    public string prefab;
 }
 [System.Serializable]
 public class CatalogItem

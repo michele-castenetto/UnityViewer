@@ -164,8 +164,8 @@ public class InputManager : Singleton<InputManager>
         
         inputSystem.Camera.TouchPosition.performed += ctx => TouchMove(ctx);
 
-        inputSystem.Camera.FingetTwoTouch.started += _ => ZoomStart();
-        inputSystem.Camera.FingetTwoTouch.canceled += _ => ZoomEnd();
+        inputSystem.Camera.FingerTwoTouch.started += _ => ZoomStart();
+        inputSystem.Camera.FingerTwoTouch.canceled += _ => ZoomEnd();
 
     }
 

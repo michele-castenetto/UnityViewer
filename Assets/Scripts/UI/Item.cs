@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEditor;
 
 public class Item : MonoBehaviour
 {
@@ -44,6 +45,11 @@ public class Item : MonoBehaviour
         
         Sprite sprite = Resources.Load<Sprite>($"Images/{catalogItem.image}");
         this.image.sprite = sprite;
+        
+        // ##TODO
+        // Texture2D image = AssetPreview.GetMiniThumbnail(Resources.Load("Models/Axe"));
+        // Sprite sprite = Sprite.Create(image, new Rect(0, 0, image.width, image.height), new Vector2(0, 0), 100, 0 , SpriteMeshType.Tight);
+        // this.image.sprite = sprite;
 
     }
 

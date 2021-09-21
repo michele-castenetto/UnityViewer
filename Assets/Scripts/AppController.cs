@@ -26,8 +26,17 @@ public class AppController : Singleton<AppController>
     public ButtonInfoClickEvent OnButtonInfoClickEvent;
     public delegate void ItemSelectEvent(string id);
     public ItemSelectEvent OnItemSelectEvent;
-
+    public delegate void MeshPickEvent(GameObject gameObj);
+    public MeshPickEvent OnMeshPickEvent;
+    public delegate void InterestPointPickEvent(GameObject gameObj);
+    public InterestPointPickEvent OnInterestPointPickEvent;
     
+    // Materials
+
+    Material interestPointMaterial;
+
+
+
     // Link dependencies
     private CameraController cameraController;
     public void SetCameraController(CameraController controller) {
@@ -41,8 +50,12 @@ public class AppController : Singleton<AppController>
     public void SetTabInfo(TabInfo _tabInfo) {
         this.tabInfo = _tabInfo;
     }
-    
+    private TabInterestPoint tabTabInterestPoint;
+    public void SetTabInterestPoint(TabInterestPoint _tabTabInterestPoint) {
+        this.tabTabInterestPoint = _tabTabInterestPoint;
+    }
 
+    
     private void Awake() {
 
         // Debug.Log("[AppController.Awake]");
@@ -55,7 +68,10 @@ public class AppController : Singleton<AppController>
 
     private void Start()
     {
-        
+
+        // Load Materials
+        LoadMaterials();
+
         // Read Config file
 
         configReader.readConfig();
@@ -80,13 +96,28 @@ public class AppController : Singleton<AppController>
 
         OnButtonInfoClickEvent += () => tabInfo.Toggle();
 
+        // ##OLD
         // OnButtonFocusClickEvent += () => Debug.Log("focus with camera");
+
+        OnMeshPickEvent += (gameObj) => MeshPickEventHandler(gameObj);
 
         // Log App Start
 
         Debug.Log("[AppController.Start] App Started");
 
     }
+
+    private void MeshPickEventHandler(GameObject gameObj) {
+
+        InterestPoint interestPoint = gameObj.GetComponent<InterestPoint>();
+        if (interestPoint == null) return;
+        interestPoint.OnPickAction();
+
+        tabTabInterestPoint.UpdateUI(interestPoint.itemPoint);
+        tabTabInterestPoint.Toggle(true);
+
+    }
+
     
     private void Exit() {
         Debug.Log("Exit from app");
@@ -113,9 +144,9 @@ public class AppController : Singleton<AppController>
         catalogItemSelected = catalogItem;
         if (catalogItem == null) return;
         
-        GameObject loadedObj = Resources.Load<GameObject>($"Models/{catalogItem.geometry.file}");
+        GameObject loadedObj = Resources.Load<GameObject>($"Models/{catalogItem.geometry.prefab}");
         if (loadedObj == null) {
-            Debug.Log($"[AppController.LoadObject] Resource model {catalogItem.geometry.file} is null");
+            Debug.Log($"[AppController.LoadObject] Resource model {catalogItem.geometry.prefab} is null");
             return;
         }
         Vector3 startPosition = new Vector3(0, 2, 0);
@@ -133,15 +164,44 @@ public class AppController : Singleton<AppController>
 
     }
     
+    public void LoadMaterials() {
+
+        interestPointMaterial = Resources.Load<Material>("Materials/InterestPoint");
+
+    }
+
     private void AddInterestPoint(GameObject itemObj, ItemPoint itemPoint) {
 
         Vector3 position = new Vector3(itemPoint.position[0], itemPoint.position[1], itemPoint.position[2] );  
+        // Debug.Log($"[AppController.AddInterestPoint] point position: {position}");
+        // Debug.Log($"[AppController.AddInterestPoint] itemObj position: {itemObj.transform.position}");
 
         GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        // sphere.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-        sphere.transform.position = position;
         
-        sphere.transform.parent = itemObj.transform;
+        sphere.transform.SetParent(itemObj.transform);
+
+        sphere.transform.position = itemObj.transform.position + position;
+        sphere.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+
+        sphere.name = "InterestPoint_" + itemPoint.id;
+        sphere.tag = "pickable";
+
+        InterestPoint interestPoint = sphere.AddComponent<InterestPoint>();
+        // Debug.Log($"[AppController.AddInterestPoint] interestPoint {interestPoint}");
+
+        // InterestPoint interestPoint2 = sphere.GetComponent<InterestPoint>();
+        // Debug.Log($"[AppController.AddInterestPoint] interestPoint2 {interestPoint2}");
+
+        interestPoint.itemPoint = itemPoint;
+
+        MeshRenderer meshRenderer = sphere.GetComponent<MeshRenderer>();
+        
+        // ##TODO
+        // meshRenderer.allowOcclusionWhenDynamic = false;
+        // meshRenderer.sortingLayerName = "UI";
+        // meshRenderer.sortingOrder = 0;
+
+        meshRenderer.material = interestPointMaterial;
 
     }
 

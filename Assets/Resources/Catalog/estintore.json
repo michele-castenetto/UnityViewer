@@ -7,7 +7,7 @@
         "description": "L'estintore serve per spegnere il fuoco"
     },
     "geometry": {
-        "file": "Cylinder"
+        "prefab": "Extinguisher"
     },
     "points": [
         

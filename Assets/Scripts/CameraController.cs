@@ -230,13 +230,19 @@ public class CameraController : MonoBehaviour
         Ray ray = mainCamera.ScreenPointToRay(pointerPosition);
         RaycastHit hit; 
         if (Physics.Raycast(ray, out hit)){
-            if (hit.collider != null) {
-                // Debug.Log(hit.collider.tag);
-                ISelectable selectable = hit.collider.gameObject.GetComponent<ISelectable>();
-                if (selectable != null){
-                    selectable.OnSelectAction();
-                }
-            }
+            if (hit.collider == null) return;
+            // Debug.Log($"[CameraController.DetectPick] collider.tag {hit.collider.tag}");
+            if (hit.collider.tag != "pickable") return;
+
+            appController.OnMeshPickEvent?.Invoke(hit.collider.gameObject);
+            
+            // ##OLD
+            // if (hit.collider != null) {
+            //     ISelectable selectable = hit.collider.gameObject.GetComponent<ISelectable>();
+            //     if (selectable != null){
+            //         selectable.OnSelectAction();
+            //     }
+            // }
         }
 
     }

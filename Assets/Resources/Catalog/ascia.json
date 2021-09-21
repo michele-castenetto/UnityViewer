@@ -4,28 +4,28 @@
     "image": "diamond",
     "info": {
         "title": "Ascia",
-        "description": "L'ascia serve per rompere cose"
+        "description": "Descrizione ascia"
     },
     "geometry": {
-        "file": "Cube"
+        "prefab": "Axe"
     },
     "points": [
         {
             "id": "manico",
             "label": "Manico",
-            "position": [-1, 1, 0],
+            "position": [0, 0.5, 0.1],
             "info": {
                 "title": "Manico",
-                "description": ""
+                "description": "Descrizione manico"
             }
         },
         {
-            "id": "ascia",
-            "label": "Ascia",
-            "position": [1, 1, 0],
+            "id": "lama",
+            "label": "Lama",
+            "position": [0, 0, 0.1],
             "info": {
-                "title": "Ascia",
-                "description": ""
+                "title": "Lama",
+                "description": "Descrizione lama"
             }
         }
     ]

@@ -75,12 +75,28 @@ public class @InputSystem : IInputActionCollection, IDisposable
                     ""interactions"": """"
                 },
                 {
-                    ""name"": ""FingetTwoTouch"",
+                    ""name"": ""FingerTwoTouch"",
                     ""type"": ""Button"",
                     ""id"": ""308910db-fe15-435b-99d0-4a5776bc831f"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": ""Press(behavior=2)""
+                },
+                {
+                    ""name"": ""FingerOneDelta"",
+                    ""type"": ""Value"",
+                    ""id"": ""1301ce15-ab5b-425c-a9d6-5b195ad3850c"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""FingerTwoDelta"",
+                    ""type"": ""Value"",
+                    ""id"": ""437553c3-a434-4a22-bda1-4737bfe246b8"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -168,7 +184,29 @@ public class @InputSystem : IInputActionCollection, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""FingetTwoTouch"",
+                    ""action"": ""FingerTwoTouch"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4415037c-810c-4354-aaf2-46d19081f6bf"",
+                    ""path"": ""<Touchscreen>/touch0/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FingerOneDelta"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""158532ab-4c4f-4630-95b5-b1def5637fd5"",
+                    ""path"": ""<Touchscreen>/touch1/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FingerTwoDelta"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -213,7 +251,9 @@ public class @InputSystem : IInputActionCollection, IDisposable
         m_Camera_TouchPress = m_Camera.FindAction("TouchPress", throwIfNotFound: true);
         m_Camera_FingerOnePosition = m_Camera.FindAction("FingerOnePosition", throwIfNotFound: true);
         m_Camera_FingerTwoPosition = m_Camera.FindAction("FingerTwoPosition", throwIfNotFound: true);
-        m_Camera_FingetTwoTouch = m_Camera.FindAction("FingetTwoTouch", throwIfNotFound: true);
+        m_Camera_FingerTwoTouch = m_Camera.FindAction("FingerTwoTouch", throwIfNotFound: true);
+        m_Camera_FingerOneDelta = m_Camera.FindAction("FingerOneDelta", throwIfNotFound: true);
+        m_Camera_FingerTwoDelta = m_Camera.FindAction("FingerTwoDelta", throwIfNotFound: true);
         // Game
         m_Game = asset.FindActionMap("Game", throwIfNotFound: true);
         m_Game_Esc = m_Game.FindAction("Esc", throwIfNotFound: true);
@@ -273,7 +313,9 @@ public class @InputSystem : IInputActionCollection, IDisposable
     private readonly InputAction m_Camera_TouchPress;
     private readonly InputAction m_Camera_FingerOnePosition;
     private readonly InputAction m_Camera_FingerTwoPosition;
-    private readonly InputAction m_Camera_FingetTwoTouch;
+    private readonly InputAction m_Camera_FingerTwoTouch;
+    private readonly InputAction m_Camera_FingerOneDelta;
+    private readonly InputAction m_Camera_FingerTwoDelta;
     public struct CameraActions
     {
         private @InputSystem m_Wrapper;
@@ -285,7 +327,9 @@ public class @InputSystem : IInputActionCollection, IDisposable
         public InputAction @TouchPress => m_Wrapper.m_Camera_TouchPress;
         public InputAction @FingerOnePosition => m_Wrapper.m_Camera_FingerOnePosition;
         public InputAction @FingerTwoPosition => m_Wrapper.m_Camera_FingerTwoPosition;
-        public InputAction @FingetTwoTouch => m_Wrapper.m_Camera_FingetTwoTouch;
+        public InputAction @FingerTwoTouch => m_Wrapper.m_Camera_FingerTwoTouch;
+        public InputAction @FingerOneDelta => m_Wrapper.m_Camera_FingerOneDelta;
+        public InputAction @FingerTwoDelta => m_Wrapper.m_Camera_FingerTwoDelta;
         public InputActionMap Get() { return m_Wrapper.m_Camera; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -316,9 +360,15 @@ public class @InputSystem : IInputActionCollection, IDisposable
                 @FingerTwoPosition.started -= m_Wrapper.m_CameraActionsCallbackInterface.OnFingerTwoPosition;
                 @FingerTwoPosition.performed -= m_Wrapper.m_CameraActionsCallbackInterface.OnFingerTwoPosition;
                 @FingerTwoPosition.canceled -= m_Wrapper.m_CameraActionsCallbackInterface.OnFingerTwoPosition;
-                @FingetTwoTouch.started -= m_Wrapper.m_CameraActionsCallbackInterface.OnFingetTwoTouch;
-                @FingetTwoTouch.performed -= m_Wrapper.m_CameraActionsCallbackInterface.OnFingetTwoTouch;
-                @FingetTwoTouch.canceled -= m_Wrapper.m_CameraActionsCallbackInterface.OnFingetTwoTouch;
+                @FingerTwoTouch.started -= m_Wrapper.m_CameraActionsCallbackInterface.OnFingerTwoTouch;
+                @FingerTwoTouch.performed -= m_Wrapper.m_CameraActionsCallbackInterface.OnFingerTwoTouch;
+                @FingerTwoTouch.canceled -= m_Wrapper.m_CameraActionsCallbackInterface.OnFingerTwoTouch;
+                @FingerOneDelta.started -= m_Wrapper.m_CameraActionsCallbackInterface.OnFingerOneDelta;
+                @FingerOneDelta.performed -= m_Wrapper.m_CameraActionsCallbackInterface.OnFingerOneDelta;
+                @FingerOneDelta.canceled -= m_Wrapper.m_CameraActionsCallbackInterface.OnFingerOneDelta;
+                @FingerTwoDelta.started -= m_Wrapper.m_CameraActionsCallbackInterface.OnFingerTwoDelta;
+                @FingerTwoDelta.performed -= m_Wrapper.m_CameraActionsCallbackInterface.OnFingerTwoDelta;
+                @FingerTwoDelta.canceled -= m_Wrapper.m_CameraActionsCallbackInterface.OnFingerTwoDelta;
             }
             m_Wrapper.m_CameraActionsCallbackInterface = instance;
             if (instance != null)
@@ -344,9 +394,15 @@ public class @InputSystem : IInputActionCollection, IDisposable
                 @FingerTwoPosition.started += instance.OnFingerTwoPosition;
                 @FingerTwoPosition.performed += instance.OnFingerTwoPosition;
                 @FingerTwoPosition.canceled += instance.OnFingerTwoPosition;
-                @FingetTwoTouch.started += instance.OnFingetTwoTouch;
-                @FingetTwoTouch.performed += instance.OnFingetTwoTouch;
-                @FingetTwoTouch.canceled += instance.OnFingetTwoTouch;
+                @FingerTwoTouch.started += instance.OnFingerTwoTouch;
+                @FingerTwoTouch.performed += instance.OnFingerTwoTouch;
+                @FingerTwoTouch.canceled += instance.OnFingerTwoTouch;
+                @FingerOneDelta.started += instance.OnFingerOneDelta;
+                @FingerOneDelta.performed += instance.OnFingerOneDelta;
+                @FingerOneDelta.canceled += instance.OnFingerOneDelta;
+                @FingerTwoDelta.started += instance.OnFingerTwoDelta;
+                @FingerTwoDelta.performed += instance.OnFingerTwoDelta;
+                @FingerTwoDelta.canceled += instance.OnFingerTwoDelta;
             }
         }
     }
@@ -393,7 +449,9 @@ public class @InputSystem : IInputActionCollection, IDisposable
         void OnTouchPress(InputAction.CallbackContext context);
         void OnFingerOnePosition(InputAction.CallbackContext context);
         void OnFingerTwoPosition(InputAction.CallbackContext context);
-        void OnFingetTwoTouch(InputAction.CallbackContext context);
+        void OnFingerTwoTouch(InputAction.CallbackContext context);
+        void OnFingerOneDelta(InputAction.CallbackContext context);
+        void OnFingerTwoDelta(InputAction.CallbackContext context);
     }
     public interface IGameActions
     {

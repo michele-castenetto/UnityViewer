@@ -62,12 +62,28 @@
                     "interactions": ""
                 },
                 {
-                    "name": "FingetTwoTouch",
+                    "name": "FingerTwoTouch",
                     "type": "Button",
                     "id": "308910db-fe15-435b-99d0-4a5776bc831f",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "Press(behavior=2)"
+                },
+                {
+                    "name": "FingerOneDelta",
+                    "type": "Value",
+                    "id": "1301ce15-ab5b-425c-a9d6-5b195ad3850c",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "FingerTwoDelta",
+                    "type": "Value",
+                    "id": "437553c3-a434-4a22-bda1-4737bfe246b8",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": ""
                 }
             ],
             "bindings": [
@@ -155,7 +171,29 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "FingetTwoTouch",
+                    "action": "FingerTwoTouch",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4415037c-810c-4354-aaf2-46d19081f6bf",
+                    "path": "<Touchscreen>/touch0/delta",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "FingerOneDelta",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "158532ab-4c4f-4630-95b5-b1def5637fd5",
+                    "path": "<Touchscreen>/touch1/delta",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "FingerTwoDelta",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
